@@ -1,0 +1,71 @@
+#libreria que se usará
+library(dplyr)
+#Definicion y lectura del archivo
+dataFile <- "./data/household_power_consumption.txt"
+power <- read.table(dataFile, header=T, sep=";")
+power$Date <- as.Date(power$Date, format="%d/%m/%Y")
+df <- power[(power$Date=="2007-02-01") | (power$Date=="2007-02-02"),]
+#Definicion del tipo de variables
+df$Global_active_power <- as.numeric(as.character(df$Global_active_power))
+df$Global_reactive_power <- as.numeric(as.character(df$Global_reactive_power))
+df$Voltage <- as.numeric(as.character(df$Voltage))
+
+df <- transform(df, timestamp=as.POSIXct(paste(Date, Time)), "%d/%m/%Y %H:%M:%S")
+df$Sub_metering_1 <- as.numeric(as.character(df$Sub_metering_1))
+df$Sub_metering_2 <- as.numeric(as.character(df$Sub_metering_2))
+df$Sub_metering_3 <- as.numeric(as.character(df$Sub_metering_3))
+#Creacion del primer gráfico
+plot1 <- function() {
+  hist(df$Global_active_power, main = paste("Global Active Power"), col="red", xlab="Global Active Power (kilowatts)")
+  dev.copy(png, file="plot1.png", width=480, height=480)
+  dev.off()
+  cat("Plot1.png has been saved in", getwd())
+}
+plot1()
+
+# Ajustes necesarios para el segundo gráfico
+plot(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Global_active_power, type = "l", xlab = "", ylab = "Global Active Power(kilowatts)")
+
+#Crea el gráfico de fecha vs tiempo
+plot(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Sub_metering_1, type = "l", xlab = "", ylab = "Energy sub metering")
+
+#Agrega la linea en rojo
+lines(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Sub_metering_2, type = "l", col = "red" )
+
+#Agrega la linea en azul
+lines(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Sub_metering_3, type = "l", col = "blue" )
+
+#Define el titulo del grafico
+legend("topright", lty= 1, col = c("Black", "red", "blue"), legend = c( "Sub_metering_1", "Sub_metering_2", "Sub_metering_3"))
+
+
+#Define el parametr para usar 4 graficos en el display
+par(mfcol = c(2,2))
+
+
+# Crea el grafico de active power data
+plot(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Global_active_power, type = "l", 
+     xlab = "", ylab = "Global Active Power(kilowatts)")
+
+
+#Generacion del segundo grafico con metering data
+
+plot(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Sub_metering_1, type = "l", xlab = "", ylab = "Energy sub metering")
+
+#Agrega la linea en rojo para metering data
+lines(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Sub_metering_2, type = "l", col = "red" )
+
+#Agrega la linea en azul para metering data
+lines(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Sub_metering_3, type = "l", col = "blue" )
+
+#Titulo del grafico
+legend("topright", lty= 1, col = c("Black", "red", "blue"), legend = c( "Sub_metering_1", "Sub_metering_2", "Sub_metering_3"))
+
+
+#Creacion del grafico con voltaje
+plot(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Voltage, type = "l", 
+     xlab = "datetime", ylab = "Voltage")
+
+#Creacion del grafico con reactive power
+plot(strptime(pwrcons$Timestamp, "%d/%m/%Y %H:%M:%S"), pwrcons$Global_reactive_power, type = "l", 
+     xlab = "datetime", ylab = "Global_reactive_power")
